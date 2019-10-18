@@ -2,32 +2,51 @@ import cv2
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import math
+import os
+
+def file_extension(path):
+    return os.path.splitext(path)[1]
 
 def randomCrop(img) :
-    x = random.randint(0, int(width*2/3))
-    y = random.randint(0, int(height*2/3))
-    w = random.randint(100, width-200)
-    h = random.randint(100, height-200)
+    x = random.randint(0, int(width*1/10))
+    y = random.randint(0, int(height*1/10))
+    w = width - int(width*1/10)
+    h = height - int(height*1/10)
     croppedImg = img[y:y+h, x:x+w]
+    croppedImg = cv2.resize(croppedImg, (width, height))
     return croppedImg
 
 def borderLine(img):
-    for i in range(width):
-        for color in range(3):
-            img[0][i][color] = 0
-            img[height-1][i][color] = 0
+    c = random.randint(0, 4)
+    colors = [(0,0,0), (255,255,255), (255,0,0), (0,255,0), (0,0,255)]
+
+    if random.randint(0, 1):
+        for i in range(width):
+            for color in range(3):
+                img[0][i][color] = colors[c][color]
+
+    if random.randint(0, 1):
+        for i in range(width):
+            for color in range(3):
+                img[height-1][i][color] = colors[c][color]
     
-    for i in range(height):
-        for color in range(3):
-            img[i][0][color] = 0
-            img[i][width-1][color] = 0
+    if random.randint(0, 1):
+        for i in range(height):
+            for color in range(3):
+                img[i][0][color] = colors[c][color]
+
+    if random.randint(0, 1):
+        for i in range(height):
+            for color in range(3):
+                img[i][width-1][color] = colors[c][color]
     return img
 
 def randomShifting(image):
-    padding = random.randint(1, 25)
+    padding = random.randint(10, 30)
     oshape_h = height + (2 * padding)
     oshape_w = width + (2 * padding)
-    img_pad = np.zeros([oshape_h, oshape_w, depth], np.uint8)
+    img_pad = np.ones([oshape_h, oshape_w, depth], np.uint8) * 255
     img_pad[padding:padding+height, padding:padding+width, 0:depth] = image
 
     c = [0, padding*2]
@@ -38,75 +57,34 @@ def randomShifting(image):
     return shiftedImg
 
 def reSize(img):
-    img = cv2.resize(img, (int(width*2/3), int(height*2/3)))
-    return img
+    p = random.randint(5,9)/10
+    img = cv2.resize(img, (int(width*p), int(height*p)))
+    top = random.randint(0, height-int(height*p))
+    down = height-int(height*p) - top
+    left = random.randint(0, width-int(width*p))
+    right = width-int(width*p) - left
+    imgPad = cv2.copyMakeBorder(img, top, down, left, right, cv2.BORDER_CONSTANT, value = (255,255,255))
+    return imgPad
 
-# All the 6 methods for comparison in a list
-methods = ['cv2.TM_CCORR_NORMED']
-# methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
-#             'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
-def isSame(img, template):
-    d, w, h = template.shape[::-1]
-    img2 = img.copy()
-    for meth in methods:
-        img = img2.copy()
-        method = eval(meth)
+# Check if the folder is exits
+folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted"]
+for i in range(4):
+    path = os.getcwd() + folders[i]
+    if not os.path.isdir(path):
+        os.mkdir(path)
 
-        # Apply template Matching
-        try:
-            res = cv2.matchTemplate(img, template, method)
-            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        except cv2.error:
-            return False
-        if (max_val < 0.5):
-            return False
+path = os.getcwd() + '\\pictures'
+if not os.path.isdir(path):
+    print("There's no pictures folder!")
+    exit(0)
 
-
-
-        print(min_val)
-        print(max_val)
-        
-        
-        if (min_val < 0.8 and max_val < 0.95):
-            template = cv2.resize(template, (width, height))
-            print("Resized:")
-            try:
-                res = cv2.matchTemplate(img, template, method)
-                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-            except cv2.error:
-                return False
-            if (max_val < 0.85 and min_val < 0.85):
-                return False
-    
-        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            top_left = min_loc
-        else:
-            top_left = max_loc
-        bottom_right = (top_left[0] + w, top_left[1] + h)
-
-        cv2.rectangle(img,top_left, bottom_right, 255, 2)
-        cv2.imwrite(str(meth) + ".jpg", img)
-    return True
-
-imgOriginal = cv2.imread("EI6rDBqmt7BV61R-750x1125.jpg")
-shape = imgOriginal.shape
-height = shape[0]
-width = shape[1]
-depth = shape[2]
-
-imgResized = reSize(imgOriginal)
-imgShifted = randomShifting(imgOriginal)
-imgBorderLined = borderLine(imgOriginal)
-imgCropped = randomCrop(imgOriginal)
-
-print(isSame(imgOriginal, imgResized))
-print(isSame(imgOriginal, imgShifted))
-print(isSame(imgOriginal, imgBorderLined))
-print(isSame(imgOriginal, imgCropped))
-
-
-img2 = cv2.imread("FullHD-Akira-Wallpaper.jpg")
-img2 = cv2.resize(img2, (int(img2.shape[1]*1/3), int(img2.shape[0]*1/3)))
-
-print(isSame(imgOriginal, img2))
+for root, dirs, files in os.walk(path):
+    for f in files:
+        fullpath = os.path.join(root, f)
+        if file_extension(fullpath) == '.jpg' or file_extension(fullpath) == '.png':
+            imgOriginal = cv2.imread(fullpath)
+            depth, width, height = imgOriginal.shape[::-1]
+            cv2.imwrite(".\\Resized\\" + f, reSize(imgOriginal))
+            cv2.imwrite(".\\Shifted\\" + f, randomShifting(imgOriginal))
+            cv2.imwrite(".\\BorderLined\\" + f, borderLine(imgOriginal))
+            cv2.imwrite(".\\Cropped\\" + f, randomCrop(imgOriginal))
