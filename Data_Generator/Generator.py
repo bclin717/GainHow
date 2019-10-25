@@ -43,7 +43,7 @@ def borderLine(img):
     return img
 
 def randomShifting(image):
-    padding = random.randint(10, 30)
+    padding = random.randint(10, 25)
     oshape_h = height + (2 * padding)
     oshape_w = width + (2 * padding)
     img_pad = np.ones([oshape_h, oshape_w, depth], np.uint8) * 255
@@ -57,7 +57,7 @@ def randomShifting(image):
     return shiftedImg
 
 def reSize(img):
-    p = random.randint(5,9)/10
+    p = random.randint(7,9)/10
     img = cv2.resize(img, (int(width*p), int(height*p)))
     top = random.randint(0, height-int(height*p))
     down = height-int(height*p) - top
@@ -84,7 +84,7 @@ for root, dirs, files in os.walk(path):
         if file_extension(fullpath) == '.jpg' or file_extension(fullpath) == '.png':
             imgOriginal = cv2.imread(fullpath)
             depth, width, height = imgOriginal.shape[::-1]
-            cv2.imwrite(".\\Resized\\" + f, reSize(imgOriginal))
-            cv2.imwrite(".\\Shifted\\" + f, randomShifting(imgOriginal))
-            cv2.imwrite(".\\BorderLined\\" + f, borderLine(imgOriginal))
-            cv2.imwrite(".\\Cropped\\" + f, randomCrop(imgOriginal))
+            cv2.imwrite(".\\Resized\\resized_" + f, reSize(imgOriginal))
+            cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
+            cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
+            cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
