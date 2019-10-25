@@ -17,6 +17,24 @@ def randomCrop(img) :
     croppedImg = cv2.resize(croppedImg, (width, height))
     return croppedImg
 
+def bloodBorderLine(img):
+    loc = 28
+    thickness = 4
+    colors = [0,0,255]
+    
+    for x in range(loc, loc+thickness):
+        for i in range(x, width-x):
+            for color in range(3):
+                img[x][i][color] = colors[color]
+                img[height-x][i][color] = colors[color]
+                
+        for i in range(x, height-x):
+            for color in range(3):
+                img[i][x][color] = colors[color]
+                img[i][width-x][color] = colors[color]
+
+    return img
+
 def borderLine(img):
     c = random.randint(0, 4)
     colors = [(0,0,0), (255,255,255), (255,0,0), (0,255,0), (0,0,255)]
@@ -67,8 +85,8 @@ def reSize(img):
     return imgPad
 
 # Check if the folder is exits
-folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted"]
-for i in range(4):
+folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted", "\\Blooded"]
+for i in range(len(folders)):
     path = os.getcwd() + folders[i]
     if not os.path.isdir(path):
         os.mkdir(path)
@@ -88,3 +106,4 @@ for root, dirs, files in os.walk(path):
             cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
             cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
             cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
+            cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
