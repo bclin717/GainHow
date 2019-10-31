@@ -84,8 +84,37 @@ def reSize(img):
     imgPad = cv2.copyMakeBorder(img, top, down, left, right, cv2.BORDER_CONSTANT, value = (255,255,255))
     return imgPad
 
+def drawline(img, pt1=(0,0), pt2=(0,0), color=(0,0,255), thickness=0, gap=0) :
+    if pt1==(0,0) and pt2==(0,0):
+        pt1 = (random.randint(10, width-10), random.randint(10, int(height/2)))
+        pt2 = (random.randint(10, width-10), random.randint(pt1[1], height))
+
+    if thickness==0 and gap==0:
+        thickness = random.randint(1, 5)    
+        gap = random.randint(5, 25)
+
+    dist = ((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2)**.5
+    pts= []
+    for i in np.arange(0, dist, gap):
+        r=i/dist
+        x=int((pt1[0]*(1-r)+pt2[0]*r)+.5)
+        y=int((pt1[1]*(1-r)+pt2[1]*r)+.5)
+        p = (x,y)
+        pts.append(p)
+    
+    count = 0
+    for p in pts:
+        if(count % 2 == 0):
+            p1 = p
+        else:
+            p2 = p
+            cv2.line(img, p1, p2, color, thickness)
+        count += 1
+
+    return img
+
 # Check if the folder is exits
-folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted", "\\Blooded"]
+folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted", "\\Blooded", "\\DashedLine"]
 for i in range(len(folders)):
     path = os.getcwd() + folders[i]
     if not os.path.isdir(path):
@@ -102,8 +131,9 @@ for root, dirs, files in os.walk(path):
         if file_extension(fullpath) == '.jpg' or file_extension(fullpath) == '.png':
             imgOriginal = cv2.imread(fullpath)
             depth, width, height = imgOriginal.shape[::-1]
-            cv2.imwrite(".\\Resized\\resized_" + f, reSize(imgOriginal))
-            cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
-            cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
-            cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
-            cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
+            # cv2.imwrite(".\\Resized\\resized_" + f, reSize(imgOriginal))
+            # cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
+            # cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
+            # cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
+            # cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
+            cv2.imwrite(".\\DashedLine\\dashedLine_" + f, drawline(imgOriginal, (0, 0), (0, 0), (0, 0, 255), 0, 0))

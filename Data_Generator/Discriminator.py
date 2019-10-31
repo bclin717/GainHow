@@ -29,7 +29,7 @@ def isSame(img, template):
         if (max_val < 0.5):
             return False
         
-        if (min_val < 0.92 and max_val < 0.95):
+        if (min_val < 0.9 and max_val < 0.95):
             template = cv2.resize(template, (width, height))
             print("Resized:")
             try:
@@ -39,7 +39,7 @@ def isSame(img, template):
                 # print(max_val)
             except cv2.error:
                 return False
-            if (max_val < 0.92 and min_val < 0.92):
+            if (max_val < 0.9 and min_val < 0.92):
                 return False
     
         # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
