@@ -85,6 +85,7 @@ def reSize(img):
     return imgPad
 
 def drawline(img, pt1=(0,0), pt2=(0,0), color=(0,0,255), thickness=0, gap=0) :
+    imgLine = img.copy()
     if pt1==(0,0) and pt2==(0,0):
         pt1 = (random.randint(10, width-10), random.randint(10, int(height/2)))
         pt2 = (random.randint(10, width-10), random.randint(pt1[1], height))
@@ -92,6 +93,9 @@ def drawline(img, pt1=(0,0), pt2=(0,0), color=(0,0,255), thickness=0, gap=0) :
     if thickness==0 and gap==0:
         thickness = random.randint(1, 5)    
         gap = random.randint(5, 25)
+
+
+    cv2.line(imgLine, pt1, pt2, color, thickness)
 
     dist = ((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2)**.5
     pts= []
@@ -111,10 +115,10 @@ def drawline(img, pt1=(0,0), pt2=(0,0), color=(0,0,255), thickness=0, gap=0) :
             cv2.line(img, p1, p2, color, thickness)
         count += 1
 
-    return img
+    return img, imgLine
 
 # Check if the folder is exits
-folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted", "\\Blooded", "\\DashedLine"]
+folders = ["\\BorderLined", "\\Cropped", "\\Resized", "\\Shifted", "\\Blooded", "\\DashedLine", "\\Line"]
 for i in range(len(folders)):
     path = os.getcwd() + folders[i]
     if not os.path.isdir(path):
@@ -136,4 +140,6 @@ for root, dirs, files in os.walk(path):
             # cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
             # cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
             # cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
-            cv2.imwrite(".\\DashedLine\\dashedLine_" + f, drawline(imgOriginal, (0, 0), (0, 0), (0, 0, 255), 0, 0))
+            dashedLine, Line = drawline(imgOriginal, (0, 0), (0, 0), (0, 0, 255), 0, 0)
+            cv2.imwrite(".\\DashedLine\\dashedLine_" + f, dashedLine)
+            cv2.imwrite(".\\Line\\Line_" + f, Line)
