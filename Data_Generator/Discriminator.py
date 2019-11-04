@@ -22,8 +22,9 @@ def isSame(img, template):
         try:
             res = cv2.matchTemplate(img, template, method)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-            # print(min_val)
-            # print(max_val)
+            print("min: ", min_val)
+            print("max: ", max_val)
+            print("")
         except cv2.error:
             return False
         if (max_val < 0.5):
@@ -35,8 +36,9 @@ def isSame(img, template):
             try:
                 res = cv2.matchTemplate(img, template, method)
                 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-                # print(min_val)
-                # print(max_val)
+                print("min: ", min_val)
+                print("max: ", max_val)
+                print("")
             except cv2.error:
                 return False
             if (max_val < 0.9 and min_val < 0.92):

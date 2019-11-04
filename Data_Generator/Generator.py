@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import random
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import math
 import os
 
@@ -75,7 +75,7 @@ def randomShifting(image):
     return shiftedImg
 
 def reSize(img):
-    p = random.randint(7,9)/10
+    p = random.randint(90,100)/100
     img = cv2.resize(img, (int(width*p), int(height*p)))
     top = random.randint(0, height-int(height*p))
     down = height-int(height*p) - top
@@ -135,11 +135,11 @@ for root, dirs, files in os.walk(path):
         if file_extension(fullpath) == '.jpg' or file_extension(fullpath) == '.png':
             imgOriginal = cv2.imread(fullpath)
             depth, width, height = imgOriginal.shape[::-1]
-            # cv2.imwrite(".\\Resized\\resized_" + f, reSize(imgOriginal))
-            # cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
-            # cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
-            # cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
-            # cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
+            cv2.imwrite(".\\Resized\\resized_" + f, reSize(imgOriginal))
+            cv2.imwrite(".\\Shifted\\shifted_" + f, randomShifting(imgOriginal))
+            cv2.imwrite(".\\BorderLined\\borderLined_" + f, borderLine(imgOriginal))
+            cv2.imwrite(".\\Cropped\\cropped_" + f, randomCrop(imgOriginal))
+            cv2.imwrite(".\\Blooded\\blooded_" + f, bloodBorderLine(imgOriginal))
             dashedLine, Line = drawline(imgOriginal, (0, 0), (0, 0), (0, 0, 255), 0, 0)
             cv2.imwrite(".\\DashedLine\\dashedLine_" + f, dashedLine)
             cv2.imwrite(".\\Line\\Line_" + f, Line)
